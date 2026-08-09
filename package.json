@@ -1,0 +1,57 @@
+{
+  "name": "@zioladev/provider-tools",
+  "version": "0.1.0",
+  "description": "Define, validate, and register structured browser tools for the experimental WebMCP API.",
+  "keywords": [
+    "webmcp",
+    "model-context",
+    "agent",
+    "tools",
+    "browser",
+    "provider"
+  ],
+  "license": "Apache-2.0",
+  "author": "Ziola",
+  "homepage": "https://github.com/zioladev/provider-tools#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zioladev/provider-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zioladev/provider-tools/issues"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  },
+  "dependencies": {},
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

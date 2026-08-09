@@ -1,0 +1,19 @@
+@zioladev/provider-tools
+Copyright 2026 Ziola
+
+Source: https://github.com/zioladev/provider-tools
+
+This product includes software developed by Ziola.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this software except in compliance with the License. A copy of the
+License is included in the LICENSE file and is also available at
+http://www.apache.org/licenses/LICENSE-2.0
+
+---
+
+This package targets the experimental WebMCP browser API (`document.modelContext`),
+a W3C draft. It is an independent, open-source provider-authoring toolkit. It is
+not affiliated with, endorsed by, or a work product of any browser vendor or
+standards body, and it makes no transaction-assurance, security, or conformance
+guarantees.
