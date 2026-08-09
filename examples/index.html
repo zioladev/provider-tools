@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Corner Café — WebMCP provider demo</title>
+    <style>
+      body { font: 16px/1.5 system-ui, sans-serif; max-width: 44rem; margin: 3rem auto; padding: 0 1rem; color: #1b1b1b; }
+      h1 { font-size: 1.4rem; } code { background: #f2efe9; padding: 0.1em 0.35em; border-radius: 4px; }
+      #ticket { margin-top: 1.5rem; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; background: #fbfaf7; }
+      .muted { color: #6b6257; font-size: 0.9rem; }
+      li { margin: 0.2rem 0; }
+    </style>
+  </head>
+  <body>
+    <h1>Corner Café</h1>
+    <p>A tiny demo page that exposes two agent-callable tools via WebMCP:
+      <code>get_menu</code> (read) and <code>place_order</code> (state-changing).</p>
+    <p class="muted">Invisible to human visitors. If an in-browser agent runtime is present, the tools register on
+      <code>document.modelContext</code>. Open the console to see registration diagnostics.</p>
+
+    <div id="ticket">
+      <strong>Order ticket</strong>
+      <ul id="orders"><li class="muted">No demo orders yet.</li></ul>
+    </div>
+
+    <!--
+      This example imports the built package. From the repo root:
+          npm run build
+      then serve this folder (e.g. `npx serve examples/vanilla-cafe`) so the ESM
+      import below resolves. In a real site you would import from the npm package:
+          import { defineProvider } from '@zioladev/provider-tools';
+    -->
+    <script type="importmap">
+      { "imports": { "@zioladev/provider-tools": "../../dist/index.js" } }
+    </script>
+    <script type="module" src="./provider.js"></script>
+    <script>
+      // Paint demo orders as they are recorded by the provider handler.
+      const list = document.getElementById('orders');
+      document.addEventListener('cafe:order', (e) => {
+        const { id, total } = e.detail;
+        if (list.querySelector('.muted')) list.innerHTML = '';
+        const li = document.createElement('li');
+        li.textContent = `${id} — ${typeof total === 'number' ? '$' + total.toFixed(2) : total}`;
+        list.appendChild(li);
+      });
+    </script>
+  </body>
+</html>
