@@ -1,27 +1,18 @@
 name: Publish
 
-# Publishes @zioladev/provider-tools to npm on a GitHub Release, using npm's OIDC
-# "trusted publishing" — no long-lived NPM_TOKEN stored in GitHub secrets.
-#
-# Canonical repository: github.com/zioladev/provider-tools
-# npm scope: @zioladev (the @ziola scope was taken; the account is @zioladev).
-#
-# Do NOT cut a Release (which triggers this workflow) until the live WebMCP
-# acceptance matrix rows A–H pass — see docs/acceptance-real-browser.md.
-#
-# Prerequisites (one-time, on npmjs.com):
-#   1. The @zioladev scope/org (already secured).
-#   2. On the package settings, configure a Trusted Publisher pointing at
-#      zioladev/provider-tools + this workflow file (.github/workflows/publish.yml).
-# See: https://docs.npmjs.com/trusted-publishers
-
 on:
   release:
     types: [published]
+  workflow_dispatch:            # lets you run it by hand from the Actions tab
+    inputs:
+      dry_run:
+        description: "Dry run (build + pack, do NOT publish)"
+        type: boolean
+        default: true
 
 permissions:
   contents: read
-  id-token: write # required for OIDC trusted publishing + provenance
+  id-token: write               # enables npm provenance (a supply-chain receipt)
 
 jobs:
   publish:
@@ -36,9 +27,13 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
-      # Trusted publishing: npm >= 11.5 exchanges the OIDC id-token for a
-      # short-lived credential automatically — no NODE_AUTH_TOKEN needed.
-      - name: Ensure a recent npm (OIDC trusted publishing)
-        run: npm install -g npm@latest
-      - name: Publish
-        run: npm publish --access public --provenance
+      - name: Publish (or dry-run)
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "DRY RUN — packing only, not publishing"
+            npm publish --dry-run --access public
+          else
+            npm publish --access public --provenance
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
