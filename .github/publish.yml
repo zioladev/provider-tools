@@ -1,0 +1,44 @@
+name: Publish
+
+# Publishes @zioladev/provider-tools to npm on a GitHub Release, using npm's OIDC
+# "trusted publishing" — no long-lived NPM_TOKEN stored in GitHub secrets.
+#
+# Canonical repository: github.com/zioladev/provider-tools
+# npm scope: @zioladev (the @ziola scope was taken; the account is @zioladev).
+#
+# Do NOT cut a Release (which triggers this workflow) until the live WebMCP
+# acceptance matrix rows A–H pass — see docs/acceptance-real-browser.md.
+#
+# Prerequisites (one-time, on npmjs.com):
+#   1. The @zioladev scope/org (already secured).
+#   2. On the package settings, configure a Trusted Publisher pointing at
+#      zioladev/provider-tools + this workflow file (.github/workflows/publish.yml).
+# See: https://docs.npmjs.com/trusted-publishers
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # required for OIDC trusted publishing + provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          registry-url: https://registry.npmjs.org
+      - run: npm ci || npm install
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      # Trusted publishing: npm >= 11.5 exchanges the OIDC id-token for a
+      # short-lived credential automatically — no NODE_AUTH_TOKEN needed.
+      - name: Ensure a recent npm (OIDC trusted publishing)
+        run: npm install -g npm@latest
+      - name: Publish
+        run: npm publish --access public --provenance
